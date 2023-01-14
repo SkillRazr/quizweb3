@@ -5,6 +5,21 @@ declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 #[program]
 pub mod quiz_programs {
     use super::*;
+
+    pub fn init_quiz(ctx: Context<InitQuiz>, name: String, questions_link: String) -> Result<()> {
+        if name.chars().count() > 10 {
+            return Err(ErrorCode::NameTooLong.into());
+        }
+
+        let quiz = &mut ctx.accounts.quiz;
+
+        quiz.name = name;
+        quiz.authority = *ctx.accounts.authority.key;
+        quiz.questions_link = questions_link;
+        quiz.participants = 0;
+
+        Ok(())
+    }
 }
 
 #[derive(Accounts)]
