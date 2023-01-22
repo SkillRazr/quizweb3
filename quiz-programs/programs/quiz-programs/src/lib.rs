@@ -20,15 +20,19 @@ pub mod quiz_programs {
 
         quiz.name = name;
         quiz.authority = *ctx.accounts.authority.key;
-        quiz.questions_link = questions_link;
         quiz.participants = 0;
         quiz.questions = questions;
         quiz.init_ts = ctx.accounts.clock.unix_timestamp;
+        quiz.questions_link = questions_link;
 
         Ok(())
     }
 
-    pub fn init_participation(ctx: Context<InitParticipation>, score: u64) -> Result<()> {
+    pub fn init_participation(
+        ctx: Context<InitParticipation>,
+        score: u64,
+        answers_link: String,
+    ) -> Result<()> {
         let participation = &mut ctx.accounts.participation;
         let quiz = &mut ctx.accounts.quiz;
 
@@ -36,6 +40,7 @@ pub mod quiz_programs {
         participation.user = *ctx.accounts.authority.key;
         participation.score = score;
         participation.init_ts = ctx.accounts.clock.unix_timestamp;
+        participation.answers_link = answers_link;
 
         quiz.participants += 1;
 
@@ -93,9 +98,6 @@ pub struct Quiz {
     /// Authority
     pub authority: Pubkey,
 
-    /// Questions URI
-    pub questions_link: String,
-
     /// Number of Participants
     pub participants: u64,
 
@@ -104,6 +106,9 @@ pub struct Quiz {
 
     /// Time of Quiz Creation
     pub init_ts: i64,
+
+    /// Questions URI
+    pub questions_link: String,
 }
 
 #[account]
@@ -119,6 +124,9 @@ pub struct Participation {
 
     /// Time of Participation
     pub init_ts: i64,
+
+    ///  Link to Participation Answers
+    pub answers_link: String,
 }
 
 #[error_code]
