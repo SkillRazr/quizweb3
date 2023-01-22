@@ -7,7 +7,7 @@ pub mod quiz_programs {
     use super::*;
 
     pub fn init_quiz(ctx: Context<InitQuiz>, name: String, questions_link: String) -> Result<()> {
-        if name.chars().count() > 10 {
+        if name.chars().count() > 20 {
             return Err(ErrorCode::NameTooLong.into());
         }
 
@@ -40,6 +40,28 @@ pub struct InitQuiz<'info> {
     pub system_program: Program<'info, System>,
 }
 
+#[derive(Accounts)]
+pub struct InitParticipation<'info> {
+    #[account(
+        init,
+        seeds=[b"participation".as_ref(), quiz.key().as_ref(), authority.key().as_ref()],
+        bump,
+        payer=authority,
+        space=100
+    )]
+    pub participation: Box<Account<'info, Participation>>,
+
+    #[account(mut)]
+    pub authority: Signer<'info>,
+
+    #[account(mut)]
+    pub quiz: Box<Account<'info, Quiz>>,
+
+    pub system_program: Program<'info, System>,
+
+    pub clock: Sysvar<'info, Clock>,
+}
+
 #[account]
 pub struct Quiz {
     /// Name of the Quiz
@@ -53,6 +75,21 @@ pub struct Quiz {
 
     /// Number of Participants
     pub participants: u64,
+}
+
+#[account]
+pub struct Participation {
+    /// Quiz in which participation is happening
+    pub quiz: Pubkey,
+
+    /// Participating user
+    pub user: Pubkey,
+
+    /// Score
+    pub score: u64,
+
+    /// Time of Participation
+    pub init_ts: i64,
 }
 
 #[error_code]
