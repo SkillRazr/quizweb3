@@ -2,13 +2,16 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-quiz_programs = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+quiz_programs = "2Ynn4VhKSE9h5kvD6hi4C7ZDmu1YYihGvopgdPpsgAgv"
+
+[programs.devnet]
+quiz_programs = "2Ynn4VhKSE9h5kvD6hi4C7ZDmu1YYihGvopgdPpsgAgv"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
+cluster = "devnet"
 wallet = "/Users/catrovacer/.config/solana/id.json"
 
 [scripts]
