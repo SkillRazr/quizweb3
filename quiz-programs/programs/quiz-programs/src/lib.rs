@@ -75,7 +75,7 @@ pub struct InitParticipation<'info> {
         seeds=[b"participation".as_ref(), quiz.key().as_ref(), authority.key().as_ref()],
         bump,
         payer=authority,
-        space=100
+        space=1000
     )]
     pub participation: Box<Account<'info, Participation>>,
 
