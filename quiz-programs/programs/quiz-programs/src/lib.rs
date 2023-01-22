@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use std::vec;
 
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+declare_id!("2Ynn4VhKSE9h5kvD6hi4C7ZDmu1YYihGvopgdPpsgAgv");
 
 #[program]
 pub mod quiz_programs {
@@ -76,7 +76,7 @@ pub struct InitParticipation<'info> {
         seeds=[b"participation".as_ref(), quiz.key().as_ref(), authority.key().as_ref()],
         bump,
         payer=authority,
-        space=1000
+        space=2000
     )]
     pub participation: Box<Account<'info, Participation>>,
 
