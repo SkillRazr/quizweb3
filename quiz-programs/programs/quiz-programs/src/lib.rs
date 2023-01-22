@@ -20,6 +20,20 @@ pub mod quiz_programs {
 
         Ok(())
     }
+
+    pub fn init_participation(ctx: Context<InitParticipation>, score: u64) -> Result<()> {
+        let participation = &mut ctx.accounts.participation;
+        let quiz = &mut ctx.accounts.quiz;
+
+        participation.quiz = quiz.key();
+        participation.user = *ctx.accounts.authority.key;
+        participation.score = score;
+        participation.init_ts = ctx.accounts.clock.unix_timestamp;
+
+        quiz.participants += 1;
+
+        Ok(())
+    }
 }
 
 #[derive(Accounts)]
