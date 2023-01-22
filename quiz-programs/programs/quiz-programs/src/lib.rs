@@ -6,7 +6,12 @@ declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 pub mod quiz_programs {
     use super::*;
 
-    pub fn init_quiz(ctx: Context<InitQuiz>, name: String, questions_link: String) -> Result<()> {
+    pub fn init_quiz(
+        ctx: Context<InitQuiz>,
+        name: String,
+        questions_link: String,
+        questions: u64,
+    ) -> Result<()> {
         if name.chars().count() > 20 {
             return Err(ErrorCode::NameTooLong.into());
         }
@@ -17,6 +22,8 @@ pub mod quiz_programs {
         quiz.authority = *ctx.accounts.authority.key;
         quiz.questions_link = questions_link;
         quiz.participants = 0;
+        quiz.questions = questions;
+        quiz.init_ts = ctx.accounts.clock.unix_timestamp;
 
         Ok(())
     }
@@ -52,6 +59,8 @@ pub struct InitQuiz<'info> {
     pub authority: Signer<'info>,
 
     pub system_program: Program<'info, System>,
+
+    pub clock: Sysvar<'info, Clock>,
 }
 
 #[derive(Accounts)]
@@ -89,6 +98,12 @@ pub struct Quiz {
 
     /// Number of Participants
     pub participants: u64,
+
+    /// Number of Questions
+    pub questions: u64,
+
+    /// Time of Quiz Creation
+    pub init_ts: i64,
 }
 
 #[account]
