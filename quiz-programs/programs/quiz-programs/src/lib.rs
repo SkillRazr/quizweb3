@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use std::vec;
 
 declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 
@@ -31,7 +32,7 @@ pub mod quiz_programs {
     pub fn init_participation(
         ctx: Context<InitParticipation>,
         score: u64,
-        answers_link: String,
+        answers: Vec<Answers>,
     ) -> Result<()> {
         let participation = &mut ctx.accounts.participation;
         let quiz = &mut ctx.accounts.quiz;
@@ -40,7 +41,7 @@ pub mod quiz_programs {
         participation.user = *ctx.accounts.authority.key;
         participation.score = score;
         participation.init_ts = ctx.accounts.clock.unix_timestamp;
-        participation.answers_link = answers_link;
+        participation.answers = answers;
 
         quiz.participants += 1;
 
@@ -125,8 +126,14 @@ pub struct Participation {
     /// Time of Participation
     pub init_ts: i64,
 
-    ///  Link to Participation Answers
-    pub answers_link: String,
+    ///  Answers
+    pub answers: Vec<Answers>,
+}
+
+#[derive(Default, Clone, Debug, AnchorSerialize, AnchorDeserialize)]
+pub struct Answers {
+    question_no: u8,
+    answer: String,
 }
 
 #[error_code]
