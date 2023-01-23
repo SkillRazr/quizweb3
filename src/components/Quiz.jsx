@@ -19,6 +19,8 @@ import { CountdownCircleTimer } from "react-countdown-circle-timer";
 import QuizIcon from "@mui/icons-material/Quiz";
 import { getScore, shuffleArray } from "../uiHelper";
 import confetti from "canvas-confetti";
+import { PublicKey } from "@solana/web3.js";
+import { BN, utils, web3 } from "@project-serum/anchor";
 
 // quizData in the form {answer: {}, questions: []}
 
@@ -152,7 +154,7 @@ const RenderQuestion = (props) => {
   );
 };
 
-export const QuizInLine = ({ quizData, hideHowToParticipate = false }) => {
+export const QuizInLine = ({ program, provider, quizData, hideHowToParticipate = false }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [quizesData, _] = useState(quizData);
   const [allowedTime, setAllowedTime] = useState(60);
@@ -203,22 +205,51 @@ export const QuizInLine = ({ quizData, hideHowToParticipate = false }) => {
     if (unattended.length === 0) {
       setIsSubmitDisabled(true);
 
-      // make a transaction using questionAnswers as participation data
+
+      const quiz = new PublicKey('BDTWtU28yeEhp368uwKZK5rsaMub1KrRFCwEWAgqwLCw')
+
+      const [participation, _participationBump] = web3.PublicKey.findProgramAddressSync(
+        [
+          utils.bytes.utf8.encode("participation"),
+          quiz.toBuffer(),
+          provider.wallet.publicKey.toBuffer(),
+        ],
+        program.programId
+      );
+
+
       console.log("participaton obj", questionAnswers);
       const participationJson = Object.keys(questionAnswers).map((key) => ({
-        [key]: questionAnswers[key],
+        questionNo: key,
+        answer: questionAnswers[key],
       }));
       console.log("participation json", participationJson);
 
       const score = getScore(quizesData.answers, questionAnswers);
+      
+      await program.methods.initParticipation(new BN(score), participationJson)
+      .accounts({
+        participation: participation,
+        quiz: quiz,
+        authority: provider.wallet.publicKey,
+        clock: web3.SYSVAR_CLOCK_PUBKEY,
+        systemProgram: web3.SystemProgram.programId,
+      })
+      .signers([])
+      .rpc()
+      
+      const createdParticipation = await program.account.participation.fetch(participation);
+
+      console.log(createdParticipation);
+      
       setScore(score);
       if (score === 100) {
         setTimeout(() => {
           renderConfetti();
         }, 50);
       }
-    }
-  };
+    };
+  }
 
   const timerProps = {
     size: 100,

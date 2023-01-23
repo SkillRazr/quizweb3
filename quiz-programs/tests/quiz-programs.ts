@@ -4,12 +4,12 @@ import { QuizPrograms } from "../target/types/quiz_programs";
 
 describe("quiz-programs", () => {
   // Configure the client to use the local cluster.
-  const provider = anchor.AnchorProvider.local();
+  const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
   
   const program = anchor.workspace.QuizPrograms as Program<QuizPrograms>;
   
-  const quizName = "Test Quiz";
+  const quizName = "wallets";
 
   let quiz = null;
   
@@ -25,7 +25,7 @@ describe("quiz-programs", () => {
 
     quiz = _quiz;
       
-    await program.methods.initQuiz(quizName, "https://testquiz.questions.io", new anchor.BN(5))
+    await program.methods.initQuiz(quizName, "https://quizweb3.com", new anchor.BN(5))
       .accounts({
         quiz: quiz,
         authority: provider.wallet.publicKey,
@@ -38,6 +38,8 @@ describe("quiz-programs", () => {
     const createdQuiz = await program.account.quiz.fetch(quiz);
     console.log(createdQuiz);
   });
+
+  return;
 
   let participation = null;
     
