@@ -6,7 +6,7 @@ export default function QuizCarousel() {
   const [isClick, setClicked] = React.useState(false);
   const [items, setItems] = React.useState([
     "Safegaurd your NFTs",
-    "Essential bytes on Crypto",
+    "Essential bytes on Crypto wallets",
     "Beware of Cypto scams",
   ]);
 
@@ -63,7 +63,6 @@ export default function QuizCarousel() {
                 index
               )} ${index === 1 ? "active" : ""}`}
               onClick={() => {
-                console.log("item index", index);
                 setCurrentItem(index);
                 if (index !== 1) {
                   setClicked(true);
@@ -73,12 +72,12 @@ export default function QuizCarousel() {
                   return;
                 }
 
-                setTimeout(() => {
-                  index === 2
-                    ? leftRotateOneTime(items)
-                    : rightRotateOneTime(items);
-                  setClicked(false);
-                }, 200);
+                // setTimeout(() => {
+                //   index === 2
+                //     ? leftRotateOneTime(items)
+                //     : rightRotateOneTime(items);
+                //   setClicked(false);
+                // }, 200);
               }}
             >
               {item}
@@ -88,6 +87,9 @@ export default function QuizCarousel() {
                     Participate
                   </button>
                 </NavLink>
+              )}
+              {index !== 1 && isClick && (
+                <div className="text-xs text-red-600">Coming soon!</div>
               )}
             </li>
           );

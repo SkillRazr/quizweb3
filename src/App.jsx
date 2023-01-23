@@ -14,15 +14,10 @@ import {
 } from "@solana/wallet-adapter-react";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import { AnchorProvider, Program, Idl } from "@project-serum/anchor";
-import {
-    clusterApiUrl,
-    Connection,
-    PublicKey,
-} from "@solana/web3.js";
-import idl from './idl/quiz_programs.json';
+import { clusterApiUrl, Connection, PublicKey } from "@solana/web3.js";
+import idl from "./idl/quiz_programs.json";
 
 require("@solana/wallet-adapter-react-ui/styles.css");
-
 
 function App(props) {
   const [web3Program, setProgram] = useState();
@@ -34,7 +29,7 @@ function App(props) {
 
   const programID = new PublicKey(idl.metadata.address);
   const opts = {
-      preflightCommitment: "processed",
+    preflightCommitment: "processed",
   };
 
   const wallets = useMemo(
@@ -44,35 +39,32 @@ function App(props) {
 
   const getProvider = () => {
     const connection = new Connection(networkUrl);
-    
+
     const provider = new AnchorProvider(
       connection,
-      window.solana,
+      wallets[0],
       opts.preflightCommitment
-      );
-      
+    );
+    return provider;
+  };
+
+  const callFn = () => {
+    try {
+      const provider = getProvider();
+
+      const program = new Program(idl, programID, provider);
+      setProvider(provider);
       console.log(provider);
-      
-      return provider;
-    };
-    
-    const callFn = () => {
-      try {
-        const provider = getProvider();
-        
-        const program = new Program(idl, programID, provider);
-        setProvider(provider);
-        console.log(provider);
-        setProgram(program);
-        console.log(program);
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    
-    useEffect(() => {
-      callFn();
-    }, []);
+      setProgram(program);
+      console.log(program);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    callFn();
+  }, []);
 
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
   return (
@@ -80,12 +72,36 @@ function App(props) {
       <WalletProvider wallets={wallets} autoConnect>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Layout {...props} />}>
-              <Route index element={<HomePage program={web3Program} provider={web3Provider} {...props} />} />
+            <Route
+              path="/"
+              element={
+                <Layout
+                  {...props}
+                  program={web3Program}
+                  provider={web3Provider}
+                />
+              }
+            >
+              <Route
+                index
+                element={
+                  <HomePage
+                    program={web3Program}
+                    provider={web3Provider}
+                    {...props}
+                  />
+                }
+              />
 
               <Route
                 path="/quizzes/:id"
-                element={<QuizDetailsPage program={web3Program} provider={web3Provider} {...props} />}
+                element={
+                  <QuizDetailsPage
+                    program={web3Program}
+                    provider={web3Provider}
+                    {...props}
+                  />
+                }
               />
             </Route>
           </Routes>
